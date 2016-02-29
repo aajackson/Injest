@@ -7,6 +7,8 @@ public class Projectile : MonoBehaviour
     [SerializeField]
     private Rigidbody rigidBody;
     private float duration;
+    [SerializeField]
+    private Renderer projectileRenderer;
 
     public float speed = 10.0f;
 
@@ -30,5 +32,13 @@ public class Projectile : MonoBehaviour
     {
 
         Destroy(gameObject);
+    }
+
+    public void SetColor(Color color)
+    {
+        if (projectileRenderer != null)
+        {
+            projectileRenderer.material.color = color;
+        }
     }
 }

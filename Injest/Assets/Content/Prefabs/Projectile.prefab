@@ -120,6 +120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 5403284}
+  projectileRenderer: {fileID: 2330890}
   speed: 25
 --- !u!135 &13575510
 SphereCollider:

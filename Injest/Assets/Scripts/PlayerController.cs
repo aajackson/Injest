@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     public Projectile ItemPrefab = null;
     public float FiringDelay = 0.75f;
 
+    [SerializeField]
+    private UIController UIController;
     private Transform cameraTransform;
     private float nextFireTime = 0.0f;
     private List<InventoryItem> inventory = new List<InventoryItem>();
@@ -15,23 +17,36 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         cameraTransform = Camera.main.transform;
+        UIController.ShowComboUI(false);
     }
 
     private void Update()
     {
-        // Fire!
-        if (Input.GetButtonDown("Fire1") && nextFireTime <= Time.time)
+        if (Input.GetButtonDown("SelectionUI"))
         {
+            UIController.ShowComboUI();
+        }
+        else if (Input.GetButtonDown("Fire1") && !UIController.ComboUIVisible && nextFireTime <= Time.time)
+        {
+            // Fire!
             nextFireTime = Time.time + FiringDelay;
             Projectile newProjectile = Instantiate(ItemPrefab, transform.position + transform.forward * 2.0f, transform.rotation) as Projectile;
+            newProjectile.SetColor(UIController.Output.color);
             newProjectile.Launch(10.0f);
+        }
+        if (Input.GetButtonUp("SelectionUI"))
+        {
+            UIController.ShowComboUI(false);
         }
     }
 
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        if (!UIController.ComboUIVisible)
+        {
+            MovePlayer();
+        }
     }
 
     private void MovePlayer()

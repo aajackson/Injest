@@ -122,6 +122,7 @@ MonoBehaviour:
   MoveSpeed: 5
   ItemPrefab: {fileID: 11414870, guid: f1bde208755d01c4d9b671d42cef622b, type: 2}
   FiringDelay: 0.75
+  UIController: {fileID: 0}
 --- !u!136 &13630846
 CapsuleCollider:
   m_ObjectHideFlags: 1
