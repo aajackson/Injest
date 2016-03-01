@@ -8,8 +8,10 @@ public class UIController : MonoBehaviour
     public float MaxRadius = 64.0f;
     public bool SnapToTarget = false;
     public float SnapDistance = 0.75f;
+    public bool PressToConfirm = false;
+    public bool RequireInputReleaseReset = false;
+    public UnityEngine.UI.Text DebugText;
 
-    
     public UnityEngine.UI.Image Output;
 
     public ComboUIElement ElementPrefab;
@@ -81,7 +83,8 @@ public class UIController : MonoBehaviour
         {
             elements[elementIndex].transform.localScale = Vector3.one;
         }
-        SelectedElement = -1;
+
+        int lastSelectedElement = SelectedElement;
 
         // Calculate which element to hover
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -96,41 +99,63 @@ public class UIController : MonoBehaviour
                     InputAngle += 360.0f;
                 }
                 SelectedElement = Mathf.RoundToInt(InputAngle / snapAngle) % elements.Count;
+                
                 SnappedAngle = SelectedElement * snapAngle;
                 Cursor.transform.localPosition = new Vector3(MaxRadius * Mathf.Cos(SnappedAngle * Mathf.Deg2Rad), MaxRadius * Mathf.Sin(SnappedAngle * Mathf.Deg2Rad), 0.0f);
 
                 elements[SelectedElement].transform.localScale = 2.0f * Vector3.one;
+                
+                if (!PressToConfirm && lastSelectedElement != SelectedElement)
+                {
+                    SelectInput();
+                }
             }
             else
             {
+                SelectedElement = -1;
                 Cursor.transform.localPosition = input * MaxRadius;
             }
         }
         else
         {
+            SelectedElement = -1;
             Cursor.transform.localPosition = Vector3.zero;
         }
 
         // Determine if user selected an element
-        if (Input.GetButtonDown("Fire1") && SelectedElement >= 0)
+        if (PressToConfirm && Input.GetButtonDown("Fire1") && SelectedElement >= 0)
         {
-            if (currentInputIndex >=inputs.Count)
-            {
-                ResetInputs();
-            }
+            SelectInput();
+        }
 
-            inputs[currentInputIndex].color = elements[SelectedElement].ElementColor;
-            ++currentInputIndex;
-            if (currentInputIndex >= inputs.Count)
+        // Debug
+        DebugText.text = string.Format("Press To Confirm: {0}\nRelease To Reset: {1}", PressToConfirm, RequireInputReleaseReset);
+
+    }
+
+    private void SelectInput()
+    {
+        if (RequireInputReleaseReset && currentInputIndex >= inputs.Count)
+        {
+            return;
+        }
+
+        if (currentInputIndex >= inputs.Count)
+        {
+            ResetInputs();
+        }
+
+        inputs[currentInputIndex].color = elements[SelectedElement].ElementColor;
+        ++currentInputIndex;
+        if (currentInputIndex >= inputs.Count)
+        {
+            Vector4 colors = Color.black;
+            for (int inputIndex = 0; inputIndex < inputs.Count; ++inputIndex)
             {
-                Vector4 colors = Color.black;
-                for (int inputIndex = 0; inputIndex < inputs.Count; ++inputIndex)
-                {
-                    colors += (Vector4)inputs[inputIndex].color;
-                }
-                colors /= inputs.Count;
-                Output.color = colors;
+                colors += (Vector4)inputs[inputIndex].color;
             }
+            colors /= inputs.Count;
+            Output.color = colors;
         }
     }
 

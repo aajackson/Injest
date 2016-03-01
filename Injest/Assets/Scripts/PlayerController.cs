@@ -30,9 +30,21 @@ public class PlayerController : MonoBehaviour
         {
             // Fire!
             nextFireTime = Time.time + FiringDelay;
-            Projectile newProjectile = Instantiate(ItemPrefab, transform.position + transform.forward * 2.0f, transform.rotation) as Projectile;
+            float snappedRotation = Mathf.RoundToInt(transform.rotation.eulerAngles.y / 45.0f) * 45.0f;
+            Quaternion rotation = Quaternion.Euler(new Vector3(0.0f, snappedRotation, 0.0f));
+            Projectile newProjectile = Instantiate(ItemPrefab, transform.position + transform.forward * 2.0f, rotation) as Projectile;
             newProjectile.SetColor(UIController.Output.color);
             newProjectile.Launch(10.0f);
+        }
+
+        // UI Input toggles
+        if (Input.GetButtonDown("ToggleConfirmation"))
+        {
+            UIController.PressToConfirm = !UIController.PressToConfirm;
+        }
+        if (Input.GetButtonDown("ToggleReleaseReset"))
+        {
+            UIController.RequireInputReleaseReset = !UIController.RequireInputReleaseReset;
         }
         if (Input.GetButtonUp("SelectionUI"))
         {
